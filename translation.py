@@ -37,6 +37,26 @@ def query_ollama_for_translation(language: str, text: str, model: str = "gemma3"
         return None
 
 
+def unload_ollama_model(model: str = "gemma3") -> None:
+
+    # print(f" Unloading model {model}...")
+
+    print('\x1b[6;30;42m' + 'Unloading model ' + model + '\x1b[0m')
+
+    url = "http://localhost:11434/api/generate"
+    payload = {
+        "model": model,
+        "keep_alive": 0
+    }
+
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        print('\x1b[6;30;42m' + f"Model {model} unloaded successfully." + '\x1b[0m')
+    except requests.RequestException as e:
+        print(f"Error during model unload request: {e}")
+    except KeyError:
+        print("Unexpected response format from the API.")
 
 # text_to_translate = """
 #  Now, let's see the second point. The union of two regular expressions is also a regular expression. So, let's say that we have two regular 

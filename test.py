@@ -7,10 +7,10 @@ from pathlib import Path
 from datetime import datetime
 import os
 from ttspeech import text_to_speech, merge_audio_chunks_with_timestamps
+from translation import query_ollama_for_translation, unload_ollama_model
 
 # from google import genai
 # from google.genai import types
-from translation import query_ollama_for_translation
 from dotenv import load_dotenv
 import os
 
@@ -80,7 +80,7 @@ def initialize_model():
             model=model,
             tokenizer=processor.tokenizer,
             feature_extractor=processor.feature_extractor,
-            chunk_length_s=20,
+            chunk_length_s=30,
             stride_length_s=5,
             return_timestamps=True,
             device=device
@@ -116,6 +116,8 @@ def main():
             
         transcribed_chunk = result['chunks']
 
+        print(transcribed_chunk) # <-- Original english transcription
+
         translated_chunk = [
             {
                 'timestamp': entry['timestamp'],
@@ -124,10 +126,11 @@ def main():
             for entry in transcribed_chunk
         ]
 
+        unload_ollama_model(model="gemma3")
+
         text_to_speech(translated_chunk)
         merge_audio_chunks_with_timestamps(translated_chunk)
 
-        print(result['chunks']) # <-- Original english transcription
         print(translated_chunk) # <-- Translated hindi transcription
 
 
