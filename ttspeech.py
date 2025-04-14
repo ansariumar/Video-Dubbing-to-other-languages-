@@ -2,8 +2,10 @@ import torch
 from TTS.api import TTS
 import os
 import time
-from pydub import AudioSegment
 from typing import TypedDict
+from pydub import AudioSegment
+from moviepy import VideoFileClip, AudioFileClip
+import os
 
 
 class TranslationEntry(TypedDict):
@@ -22,7 +24,8 @@ output_dir = "tts_outputs"
 os.makedirs(output_dir, exist_ok=True)
 
 def text_to_speech(translated_chunk: list[TranslationEntry], speaker_wav:str="./audio_samples/modi.wav", language:str="hi") -> None:
-    
+    print("\033[96m Converting text to speech... \033[0m")
+
     for i, chunk in enumerate(translated_chunk):
         out_path = os.path.join(output_dir, f"chunk_{i}.wav")
     
@@ -34,20 +37,24 @@ def text_to_speech(translated_chunk: list[TranslationEntry], speaker_wav:str="./
             file_path=out_path,
         )
 
+    print("\033[92m Text to speech completed \033[0m")
+
 def merge_audio_chunks_with_timestamps(translated_chunk: list[TranslationEntry], chunk_folder: str = "tts_outputs", output_path: str = "final_output.wav"):
+    print("\033[96m Merging all the Audio chunks \033[0m")
+
     final_audio = AudioSegment.empty()
 
     for i, chunk in enumerate(translated_chunk):
-        start_time_sec = chunk["timestamp"][0]
-        if i == 0:
-            prev_end_time_sec = 0.0
-        else:
-            prev_end_time_sec = translated_chunk[i - 1]["timestamp"][1]
+        # start_time_sec = chunk["timestamp"][0]
+        # if i == 0:
+        #     prev_end_time_sec = 0.0
+        # else:
+        #     prev_end_time_sec = translated_chunk[i - 1]["timestamp"][1]
 
-        # Duration of silence between chunks
-        silence_duration_ms = int((start_time_sec - prev_end_time_sec) * 1000)
-        if silence_duration_ms > 0:
-            final_audio += AudioSegment.silent(duration=silence_duration_ms)
+        # # Duration of silence between chunks
+        # silence_duration_ms = int((start_time_sec - prev_end_time_sec) * 1000)
+        # if silence_duration_ms > 0:
+        #     final_audio += AudioSegment.silent(duration=silence_duration_ms)
 
         # Load the chunk audio
         chunk_path = os.path.join(chunk_folder, f"chunk_{i}.wav")
@@ -58,9 +65,62 @@ def merge_audio_chunks_with_timestamps(translated_chunk: list[TranslationEntry],
 
     # Export the final merged audio
     final_audio.export(output_path, format="wav")
-    print(f"Final audio saved to: {output_path}")
+    print("\033[92m Merging complete \033[0m")
+    print(f"\033[92m Final audio saved to: {output_path} \033[0m")
 
-    
 
+
+def speed_up_audio_to_match_video(audio_path: str, video_path: str, output_path: str = "speedup_audio.wav"):
+    print("\033[96m synchronizing Audio with Video \033[0m")
+
+    audio = AudioSegment.from_wav(audio_path)
+    video_duration_sec = VideoFileClip(video_path).duration
+    original_duration_sec = len(audio) / 1000
+
+    # Calculate speed factor
+    speed_factor = original_duration_sec / video_duration_sec
+    if speed_factor <= 1.0:
+        print("No need to speed up, audio fits within video.")
+        audio.export(output_path, format="wav")
+        return
+
+    print(f"Speeding up audio by factor of {speed_factor:.2f}")
+
+    # Use ffmpeg filter for time compression
+    import subprocess
+    subprocess.call([
+        "ffmpeg", "-y",
+        "-i", audio_path,
+        "-filter:a", f"atempo={speed_factor:.5f}",
+        output_path
+    ])
+    print("\033[92m Synchronization complete \033[0m")
+
+# overlay_audio_on_video(original_video_path="./video_sample/regex.mp4", new_audio_path="./final_output.wav")
+
+# def speed_up_audio_to_match_video(audio_path: str, video_path: str, output_path: str = "speedup_audio.wav"):
+#     audio = AudioSegment.from_wav(audio_path)
+#     video_duration_sec = VideoFileClip(video_path).duration
+#     original_duration_sec = len(audio) / 1000
+
+#     # Calculate speed factor
+#     speed_factor = original_duration_sec / video_duration_sec
+#     if speed_factor <= 1.0:
+#         print("No need to speed up, audio fits within video.")
+#         audio.export(output_path, format="wav")
+#         return
+
+#     print(f"Speeding up audio by factor of {speed_factor:.2f}")
+
+#     # Use ffmpeg filter for time compression
+#     import subprocess
+#     subprocess.call([
+#         "ffmpeg", "-y",
+#         "-i", audio_path,
+#         "-filter:a", f"atempo={speed_factor:.5f}",
+#         output_path
+#     ])
+
+# speed_up_audio_to_match_video(audio_path="./final_output.wav", video_path="./video_sample/regex.mp4")
 # chunk = [{'timestamp': (0.0, 4.0), 'text': 'इस व्याख्यान में हम एक नई विषयवस्तु शुरू करेंगे और विषय है'}, {'timestamp': (4.0, 12.0), 'text': 'नियमित अभिव्यक्तियाँ। तो, अब तक हमने कई भाषाओं और कुछ प्रकार के स्ट्रिंग्स को देखा है।'}, {'timestamp': (12.0, 19.0), 'text': 'स्वीकृत भाषाओं द्वारा। और अब तक, हमने उन स्ट्रिंग्स को दर्शाने का तरीका बस सरल का उपयोग करके था।'}, {'timestamp': (19.2, 24.0), 'text': 'अंग्रेजी भाषा। अब, नियमित अभिव्यक्तियाँ क्या हैं? नियमित अभिव्यक्तियाँ।'}, {'timestamp': (24.0, 31.26), 'text': 'ये कुछ स्ट्रिंग सेट को गणितीय तरीके से दर्शाने के लिए इस्तेमाल किए जाते हैं। तो, इसके बजाय'}, {'timestamp': (31.26, 36.24), 'text': 'सरल तरीके से उन्हें दर्शाने के, हम अब उन्हें वैसे ही दर्शा सकते हैं जैसा हमने पहले तक किया था, ये नियमित।'}, {'timestamp': (36.24, 41.84), 'text': 'अभिव्यक्तियाँ इस तरह से उपयोग किए जाते हैं ताकि हमारे स्ट्रिंग को बीजगणितीय तरीके से दर्शाया जा सके।'}, {'timestamp': (41.84, 47.14), 'text': 'तो, नियमित अभिव्यक्ति के बारे में अधिक जानने से पहले, कुछ बातें या नियम हैं जो आपको…'}, {'timestamp': (47.14, 50.0), 'text': 'हमें याद रखना होगा और देखते हैं कि वे क्या हैं।'}, {'timestamp': (50.0, 55.0), 'text': 'ठीक है, तो ये नियम या बिंदु हैं जिन्हें हमें नियमित अभिव्यक्तियों के बारे में याद रखना चाहिए।'}, {'timestamp': (55.0, 58.0), 'text': 'तो, चलो पहले बिंदु को देखते हैं। कोई भी टर्मिनल प्रतीक,'}, {'timestamp': (58.0, 66.0), 'text': 'मैं. यानी सिग्मा से संबंधित प्रतीक, जिसमें खाली और शून्य प्रतीक भी शामिल हैं, नियमित अभिव्यक्ति हैं। इसलिए, तक'}, {'timestamp': (66.0, 75.0), 'text': 'अब हमने कई प्रतीकों जैसे A, B, C और इसी तरह के कई को देखा है जिनका हम इनपुट और आउटपुट को दर्शाने के लिए उपयोग करते हैं।'}, {'timestamp': (75.0, 78.0), 'text': 'तो, ये सभी प्रतीक, जिन्हें टर्मिनल प्रतीक के रूप में जाना जाता है।'}, {'timestamp': (78.0, 83.0), 'text': 'शामिल हैं खाली और शून्य प्रतीक भी सभी नियमित अभिव्यक्तियाँ हैं।'}, {'timestamp': (83.0, 88.82), 'text': 'तो, यही पहली बात कहती है। अब, आइए दूसरी बात देखते हैं। द यूनियन'}, {'timestamp': (88.82, 99.0), 'text': 'दो नियमित अभिव्यक्तियों का संयोजन भी एक नियमित अभिव्यक्ति है। तो, मान लीजिए कि हमारे पास दो नियमित अभिव्यक्तियाँ हैं जिन्हें हम R1 और R2 कहते हैं।'}, {'timestamp': (99.0, 101.0), 'text': 'ये दो नियमित अभिव्यक्तियाँ हैं।\n'}]
 # text_to_speech(chunk)

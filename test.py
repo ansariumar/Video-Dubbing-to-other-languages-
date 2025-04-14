@@ -1,12 +1,12 @@
 import torch
 from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
 import time
-from moviepy import VideoFileClip
+from moviepy import VideoFileClip, AudioFileClip
 import sys
 from pathlib import Path
 from datetime import datetime
 import os
-from ttspeech import text_to_speech, merge_audio_chunks_with_timestamps
+from ttspeech import text_to_speech, merge_audio_chunks_with_timestamps, speed_up_audio_to_match_video
 from translation import query_ollama_for_translation, unload_ollama_model
 
 # from google import genai
@@ -80,7 +80,7 @@ def initialize_model():
             model=model,
             tokenizer=processor.tokenizer,
             feature_extractor=processor.feature_extractor,
-            chunk_length_s=30,
+            chunk_length_s=27,
             stride_length_s=5,
             return_timestamps=True,
             device=device
@@ -118,21 +118,38 @@ def main():
 
         print(transcribed_chunk) # <-- Original english transcription
 
+        print('\x1b[6;30;42m' + f"Translation has started. It has {len(transcribed_chunk)} chunks" + '\x1b[0m')
+
         translated_chunk = [
             {
                 'timestamp': entry['timestamp'],
-                'text': query_ollama_for_translation(language="hindi", text=entry['text'])
+                'text': query_ollama_for_translation(language="hindi", text=entry['text'])  
             }
             for entry in transcribed_chunk
         ]
+        
+        print(translated_chunk) # <-- Translated hindi transcription
 
-        unload_ollama_model(model="gemma3")
+        unload_ollama_model(model="gemma3")     # <-- Free up gpu and RAM after translation
 
         text_to_speech(translated_chunk)
         merge_audio_chunks_with_timestamps(translated_chunk)
+        speed_up_audio_to_match_video(audio_path="./final_output.wav", video_path=sys.argv[1])
 
-        print(translated_chunk) # <-- Translated hindi transcription
 
+        import subprocess
+        subprocess.call([
+            'ffmpeg',
+            '-i', sys.argv[1],
+            '-i', 'new_audio.wav',
+            '-map', '0:v',
+            '-map', '1:a',
+            '-c:v', 'copy',
+            '-shortest',
+            'dubbedVideo.mp4'
+        ])
+                
+        print("\033[92m Video dubbing Successful \033[0m")
 
         print(f"--- {time.time() - start_time:.2f} seconds ---")
     except Exception as e:
