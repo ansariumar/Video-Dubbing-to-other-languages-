@@ -1,0 +1,35 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environment
+minor3.10/
+
+# Distribution / packaging
+*.egg-info/
+dist/
+build/
+
+# Output files
+*.log
+*.wav
+*.mp3
+*.ogg
+*.flac
+tts_outputs/
+audio_samples/
+video_sample/
+
+# VS Code settings (optional)
+.vscode/
+
+# Test files or generated files
+test.txt
+
+Lib/
+Scripts/
+share/
+# Additonal ignored files
+*.tmp
+.env
