@@ -5,6 +5,7 @@ __pycache__/
 
 # Virtual environment
 minor3.10/
+pyvenv.cfg
 
 # Distribution / packaging
 *.egg-info/
