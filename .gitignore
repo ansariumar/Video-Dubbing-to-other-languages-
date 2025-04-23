@@ -18,6 +18,7 @@ build/
 *.mp3
 *.ogg
 *.flac
+*.mp4
 tts_outputs/
 audio_samples/
 video_sample/

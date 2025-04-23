@@ -1,0 +1,168 @@
+1
+00:00:00,000 --> 00:00:04,000
+ In this presentation, we will try to understand what are wild pointers.
+
+2
+00:00:04,000 --> 00:00:06,000
+ So, let's get started.
+
+3
+00:00:06,000 --> 00:00:10,000
+ Wild pointers are also known as uninitialized pointers.
+
+4
+00:00:10,000 --> 00:00:14,000
+ Let me tell you, they are the pointers which are uninitialized. Okay?
+
+5
+00:00:14,000 --> 00:00:18,000
+ So, these pointers usually point to some arbitrary memory location
+
+6
+00:00:18,000 --> 00:00:21,000
+ and may cause a program to crash or misbehave.
+
+7
+00:00:21,000 --> 00:00:28,839
+ Obviously, they may point to some memory location which we even don't know, right. They definitely do not contain the address of some valid memory location, right. So, it may cause a program to crash or misbehave. Obviously, they may point to some memory location which we even don't know, right. They definitely do not contain the address of some valid memory location,
+
+8
+00:00:28,839 --> 00:00:33,659
+ right. So, it may cause a program to crash or misbehave. For example, here in this case,
+
+9
+00:00:33,659 --> 00:00:36,000
+ this pointer has not been initialized yet.
+
+10
+00:00:36,000 --> 00:00:38,000
+ And here we are trying to dereference
+
+11
+00:00:38,000 --> 00:00:40,000
+ this pointer. This means that we are
+
+12
+00:00:40,000 --> 00:00:42,000
+ trying to access the location pointed
+
+13
+00:00:42,000 --> 00:00:44,000
+ by this pointer. And we are also
+
+14
+00:00:44,000 --> 00:00:46,000
+ storing this value within that location.
+
+15
+00:00:46,000 --> 00:00:48,000
+ Obviously, this may cause the program to crash.
+
+16
+00:00:48,000 --> 00:00:50,000
+ It may even cause segmentation fault.
+
+17
+00:00:50,000 --> 00:00:54,000
+ We are trying to write into the memory, which is an illegal memory.
+
+18
+00:00:54,000 --> 00:00:59,000
+ Basically, this pointer may contain the address of some illegal memory location.
+
+19
+00:00:59,000 --> 00:01:02,000
+ So, that is why this pointer is a wild pointer.
+
+20
+00:01:02,000 --> 00:01:06,400
+ It wildly behaves and may cause a program to crash or misbehave.
+
+21
+00:01:06,400 --> 00:01:09,599
+ So, this is a wild pointer without any doubt.
+
+22
+00:01:10,299 --> 00:01:13,299
+ Now, how to avoid wild pointers?
+
+23
+00:01:13,299 --> 00:01:16,000
+ What are the best practices to avoid wild pointers?
+
+24
+00:01:16,000 --> 00:01:21,000
+ The best practice is to initialize them with the address of a known variable.
+
+25
+00:01:21,000 --> 00:01:25,840
+ Here in this case, you can clearly see that pointer has been initialized with the address
+
+26
+00:01:25,840 --> 00:01:27,400
+ of this variable var.
+
+27
+00:01:27,400 --> 00:01:31,459
+ So, it is clear that this will no more be a wild pointer.
+
+28
+00:01:31,459 --> 00:01:33,799
+ It contains the address of a variable.
+
+29
+00:01:33,799 --> 00:01:36,000
+ There is no problem with this.
+
+30
+00:01:36,000 --> 00:01:41,000
+ Second is, that we should explicitly allocate the memory and put the values in the allocated memory.
+
+31
+00:01:41,000 --> 00:01:46,379
+ Here in this example, you can clearly see that we are allocating the memory using malloc.
+
+32
+00:01:46,379 --> 00:01:47,879
+ This is also a legal step.
+
+33
+00:01:47,879 --> 00:01:51,959
+ Here, we are initializing this pointer with the address of the first byte of the memory
+
+34
+00:01:51,959 --> 00:01:53,859
+ allocated by this function.
+
+35
+00:01:53,859 --> 00:01:56,819
+ And obviously, we can access that location and put some values within them. This is fine. Either you should assign the address of the first byte of the memory allocated by this function. And obviously, we can access that location and put some values within them.
+
+36
+00:01:56,819 --> 00:01:57,819
+ This is fine.
+
+37
+00:01:57,819 --> 00:02:01,680
+ Either you should assign the address of some variable or some object
+
+38
+00:02:01,680 --> 00:02:05,000
+ or explicitly allocate the memory and put the values in
+
+39
+00:02:05,000 --> 00:02:06,680
+ the allocated memory.
+
+40
+00:02:06,680 --> 00:02:11,060
+ These two steps are fine to avoid wild pointers.
+
+41
+00:02:11,060 --> 00:02:13,039
+ Okay friends, this is it for now.
+
+42
+00:02:13,039 --> 00:02:25,039
+ Thank you for watching this presentation. Okay friends, this is it for now.
+

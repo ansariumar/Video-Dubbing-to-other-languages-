@@ -50,22 +50,23 @@ import os
 # merge_audio_chunks_with_timestamps(chunk)
 # ---------------------------------------------------------------------------------------------------------------- 
 
-import subprocess
+# import subprocess
 
-subprocess.call([
-            'ffmpeg',
-            '-i', './video_sample/vaatisyg.mp4',
-            '-i', './speedup_audio.wav',
-            '-map', '0:v',
-            '-map', '1:a',
-            '-c:v', 'copy',
-            '-shortest',
-            'dubbedVideo.mp4'
-        ])
-
-
+# subprocess.call([
+#             'ffmpeg',
+#             '-i', './video_sample/pointers.mp4',
+#             '-i', './speedup_audio.wav',
+#             '-map', '0:v',
+#             '-map', '1:a',
+#             '-c:v', 'copy',
+#             '-shortest',
+#             'dubbedVideo.mp4'
+#         ])
 
 
+import sys
+
+print(sys.argv)
 
 
 

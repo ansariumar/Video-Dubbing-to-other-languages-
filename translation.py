@@ -10,7 +10,8 @@ def query_ollama_for_translation(language: str, text: str, model: str = "gemma3"
         "prompt": (
             f"Translate the following text from English to {language}. "
             f"Strictly do NOT translate technical terms, brand names, or code snippets and keep them in English. "
-            f"Only translate regular words. Only provide the translation, nothing else. Text: '{text}'"
+            f"Use short sentences in the translation and avoid long phrasing."
+            f"Only translate regular words. Provide only the translation — no extra text. Text: '{text}'"
         ),
         "stream": False,
         "options": {
@@ -69,6 +70,5 @@ def unload_ollama_model(model: str = "gemma3") -> None:
 # print(reply)
 
 
-# if __name__ == "__main__":
-#     query_ollama_for_translation()
+
 
